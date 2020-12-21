@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+        <!DOCTYPE mapper
+                PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+                "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+        <!--UserDao接口的映射文件-->
+        <!--namespace是UserDao接口的全限定类型-->
+<mapper namespace="com.du.dao.UserDao">
+
+     <!--抽取重复的sql语句-->
+     <sql id="defaultUser">
+         SELECT * FROM user
+     </sql>
+
+     <!--查询所有方法-->
+     <select id="findAll" resultType="com.du.pojo.User">
+        <include refid="defaultUser"></include>
+     </select>
+
+    <!--查询单个用户信息-->
+    <select id="findByIdUser" parameterType="int" resultType="com.du.pojo.User">
+        SELECT * FROM user WHERE id = #{id}
+    </select>
+
+    <!--根据名称模糊查询用户信息，集合的返回值也是对象-->
+    <select id="findByName" parameterType="java.lang.String" resultType="com.du.pojo.User">
+        SELECT * FROM user WHERE username like #{username}
+    </select>
+
+    <!--根据queryVo的条件查询用户-->
+    <select id="findUserByVo" parameterType="com.du.vo.QueryVo" resultType="com.du.pojo.User">
+    SELECT * FROM user WHERE username like #{user.username}
+    </select>
+
+    <!--根据条件查询-->
+    <select id="findUserByCondition" parameterType="com.du.pojo.User" resultType="com.du.pojo.User">
+        SELECT * FROM user
+        <where>
+            <if test = "username != null">
+                AND username = #{username}
+            </if>
+            <if test = "sex != null">
+                AND sex = #{sex}
+            </if>
+        </where>
+    </select>
+
+    <!-- 根据queryvo中的Id集合实现查询用户列表
+         如果是
+    -->
+    <select id="findUserInIds" parameterType="com.du.vo.QueryVo" resultType="com.du.pojo.User">
+        <include refid="defaultUser"></include>
+        <where>
+            <if test="ids != null and ids.size()>0">
+                <foreach collection="ids" open="and id in (" close=")" item="id" separator=",">
+                    <!--#{id}跟item中的值保持一致，跟set没关系-->
+                    #{id}
+                </foreach>
+
+            </if>
+        </where>
+    </select>
+
+
+
+</mapper>
